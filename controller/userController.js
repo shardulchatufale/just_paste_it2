@@ -1,7 +1,8 @@
-const UserModel = require("../model/module")
+const UserModel = require("../model/userModule")
 const bcrypt = require('bcrypt');
 const validator = require("../validator/validator")
 const crypto = require('crypto');
+const jwt= require("jsonwebtoken")
 const { log } = require("console");
 
 const UserRegistration = async function (req, res) {
@@ -26,11 +27,7 @@ const UserRegistration = async function (req, res) {
     const bcryptPassword = await bcrypt.hash(req.body.password, 10)
     req.body.password = bcryptPassword
 
-
-
-
     const user = await UserModel.create(data)
-    // console.log("..........33",user);
 
     return res.status(201).send({ status: true, message: 'User Created Successfully', data: user })
 
@@ -45,7 +42,6 @@ const login = async function (req, res) {
   try {
     const { username, password } = req.body;
 
-
     if (!username) return res.status(400).send({ status: false, message: 'Please enter email' })
     if (!validator.isValidUserName(username)) return res.status(400).send({ status: false, message: 'Please enter valid username' })
 
@@ -55,16 +51,23 @@ const login = async function (req, res) {
     if (!Login) return res.status(400).send({ status: false, message: 'Not a register email Id' })
 
     const passwordMatch = await bcrypt.compare(password, Login.password);
+  
 
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
+    console.log("..............58");
+     let token = jwt.sign(
+      {
+        userId: Login._id.toString(),
+      },
+      'just_paste_it'
+    );
+    res.setHeader('x-api-key', token);
+    res.status(200).send({ status: true,message:" YOU ARE LOG IN SUCCESSFULLY", token: token });
 
-
-
-    res.status(200).send(" YOU ARE LOG IN SUCCESSFULLY");
+  
   } catch {
-
     res.status(500).json({ message: 'Server error' });
   }
 }
@@ -121,6 +124,7 @@ const resetPss = async function (req, res) {
 
     let bcryptPassword = await bcrypt.hash(newPassword, 10)
     newPassword = bcryptPassword
+    
     user.password = newPassword;
     user.resetToken = undefined
     user.resetTokenExpiration = undefined
