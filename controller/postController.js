@@ -1,5 +1,6 @@
 const postModule = require('../model/postModule');
 const PostModule = require('../model/postModule');
+const CommentModule=require("../model/commetModue")
 const validator=require("../validator/validator")
 
 
@@ -44,63 +45,71 @@ const CreatePost = async function (req, res) {
 //..........................................................................................................
 const GetPost = async function (req, res) {
     try {
-        console.log("..........47");
-        let data = req.body;
-        let filter = {};
+        let PostId = req.query.PostId
 
-        if (Object.keys(data).length == 0) {
-            let AllPost = await PostModule.find(filter);
-            res.status(200).send(AllPost);
+        //---------[Validations]
 
-        } else {
+        if (!mongoose.Types.ObjectId.isValid(PostId)) return res.status(400).send({ status: false, message: 'Invalid UserId Format' })
 
+        //---------[Checking Book is Present in Db or not]
 
-            filter['$or'] = [
-                { UserId: data.UserId },
-                { title: data.title },
-                { _id: data.PostId }
-            ];
+        let CheckPost = await PostModule.findOne({ _id: PostId })
+        if (!CheckPost) return res.status(404).send({ status: false, message: "post Not Found" });
 
-            let AllPost = await PostModule.find(filter);
+        //---------(Check Reviews)
 
-            if (AllPost.length == 0) {
-                return res.status(404).send({ status: false, msg: 'Post not found' });
-            }
+        let CommentedData = await CommentModule.find({ PostId: PostId }).select({PostId:0})
 
-            res.status(200).send(AllPost);
-        }
-    } catch (err) {
-        res.status(500).send({ msg: 'Error', error: err.message });
+        //---------[Destructuring]
+
+        let { _id, title ,body } = CheckPost
+
+        //---------[Create response]
+
+        let data = { _id, title, body, CommentedData }
+
+        //---------[Send Response]
+
+        res.status(200).send({ status: true, message: 'Book list', data: data })
     }
+    catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
+    }
+    
 }
 //..........................................................................................................
 
 const UpdatePost = async function (req, res) {
     try {
-    
-        let PostId = req.query.PostId;
-        let UserId=  req.query.UserId
 
-        if (!mongoose.Types.ObjectId.isValid(UserId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
-      
+        let PostId = req.query.PostId;
+
         let data = req.body;
+        if(!PostId) return res.status(400).send({ status: false, message: "Please Provide postid to update post." })
+        if (!mongoose.Types.ObjectId.isValid(PostId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
+
+        if (Object.keys(data).length === 0) return res.status(400).send({ status: false, message: "Please Provide data to Update a book." })
 
         let post = await PostModule.findOne({ _id:PostId });
-        if (Object.keys(post).length == 0) {return res.status(404).send('No such post found')}
+        if (!post) return res.status(404).send({ status: false, message: "post Not Found" });
 
-        if (data.title) { 
-            let PostName = await PostModule.find({ _id: UserId })
+        const token = req.UserId
 
-            for (let i = 0; i < PostName.length; i++) {
+        if (token !== post.UserId.toString()) return res.status(403).send({ status: false, message: "you cannot update other users post" });
+
+        if (data.title) {            
+            let PostName = await PostModule.find({UserId:req.UserId })
+
+            for (let i=0;i<PostName.length; i++) {
                 if (PostName[i].title == data.title) {
                     return res.status(400).send({ status: false, msg: 'You already have same name post' });
                 }
             }
             post.title=data.title
         }
-
+       
         if (data.body) { 
-            if (!validator.isValid(data.body)) return res.status(400).send({ status: false, message: 'Please enter title name in right formate' })
+            if (!validator.isValid(data.body)) return res.status(400).send({ status: false, message: 'Please enter body in right formate' })
             post.body=data.body
          }
 
@@ -117,32 +126,35 @@ const UpdatePost = async function (req, res) {
 
 const deletedByQuery = async function (req, res) {
     try {
-        console.log("........112");
-        let data = req.query;
-        let token = req.headers['just_paste_it'];
+        let PostId = req.query.PostId
 
-        if (Object.keys(data).length == 0)
-            return res.status(400).send({ status: false, msg: 'no query params data' });
+        //---------[Validations]
 
-        if (!data.UserId)
-            return res.status(400).send({ status: false, msg: 'UserId id required' });
+        if (!mongoose.Types.ObjectId.isValid(PostId)) return res.status(400).send({ status: false, message: 'Invalid UserId Format' })
 
-        let decodedToken = jwt.verify(token,'just_paste_it');
-        if (decodedToken.UserId != data.UserId)
-            return res.status(403).send({ status: false, msg: 'Unauthorized' });
+        //---------[Check Book is Present in Db or not]
 
-            let findBlog = await userModule.findOne({ UserId:data.UserId,_id:data.PostId });
-            if(!findBlog){return res.send({message:"data not found"})}
-       
-        
-        const DeletedData = await postModule.deleteOne({_id:data.PostId})
+        let CheckPost = await PostModule.findOne({ _id: PostId});
+        if (!CheckPost) return res.status(404).send({ status: false, message: "post Not Found" });
 
-        res.status(200).send({ status: true, data: 'successfully deleted' });
+        //---------[Authorisation]
+
+        const token = req.UserId
+        if (token !== CheckPost.UserId.toString()) res.status(403).send({ status: false, message: "you cannot delete other users book" });
+
+        //---------[Update Book]
+
+        await PostModule.findOneAndUpdate(
+            { _id: CheckPost },
+            { new: true }
+        );
+
+        //---------[Response send]
+
+        res.status(200).send({ status: true, message: 'This post is deleted successfully' })
 
     } catch (err) {
-        res.status(500).send({
-            status: false, msg: err.message,
-        });
+        res.status(500).send({ status: false, message: err.message })
     }
 };
 module.exports.CreatePost = CreatePost
