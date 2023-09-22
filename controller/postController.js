@@ -84,7 +84,6 @@ const UpdatePost = async function (req, res) {
         if (!mongoose.Types.ObjectId.isValid(UserId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
       
         let data = req.body;
-    
 
         let post = await PostModule.findOne({ _id:PostId });
         if (Object.keys(post).length == 0) {return res.status(404).send('No such post found')}
@@ -105,10 +104,7 @@ const UpdatePost = async function (req, res) {
             post.body=data.body
          }
 
-
-
         let updateData = await PostModule.findByIdAndUpdate({ _id:PostId }, post,{new:true} );
-        // console.log(updateData);
 
         res.status(200).send({ status: true, msg: "updated successfully", data: updateData });
 

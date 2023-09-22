@@ -3,25 +3,15 @@
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
-<<<<<<< HEAD
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.2",
     "nodemon": "^3.0.1"
-=======
-    "mongoose": "^7.5.2"
->>>>>>> f5f9422a81329dfff8eb8c9a5a7e4dd8bcb41c86
   },
   "name": "just_paste_it2",
   "description": "",
   "version": "1.0.0",
   "main": "index.js",
-<<<<<<< HEAD
   "scripts": {
-=======
-  "devDependencies": {},
-  "scripts": {
-    "start" : "node index.js",
->>>>>>> f5f9422a81329dfff8eb8c9a5a7e4dd8bcb41c86
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
