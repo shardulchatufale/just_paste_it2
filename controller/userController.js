@@ -54,12 +54,12 @@ const login = async function (req, res) {
   
 
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Invalid username or password' });
+      return res.status(401).send({ message: 'Invalid username or password' });
     }
     console.log("..............58");
      let token = jwt.sign(
       {
-        userId: Login._id.toString(),
+        UserId: Login._id.toString(),
       },
       'just_paste_it'
     );
