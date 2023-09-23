@@ -45,7 +45,7 @@ const CreatePost = async function (req, res) {
 //..........................................................................................................
 const GetPost = async function (req, res) {
     try {
-        console.log("..........48");
+      
         let PostId = req.query.PostId
        
 
@@ -60,7 +60,7 @@ const GetPost = async function (req, res) {
         //---------(Check Reviews)
 
         let CommentedData = await CommentModule.find({ PostId: PostId }).select({PostId:0})
-console.log(CommentedData);
+
         //---------[Destructuring]
 
         let { _id, title ,body } = CheckPost
@@ -145,8 +145,8 @@ const deletedByQuery = async function (req, res) {
 
         //---------[Update Book]
 
-        await PostModule.findOneAndUpdate(
-            { _id: CheckPost },
+        await PostModule.findByIdAndDelete(
+            { _id: PostId },
             { new: true }
         );
 
