@@ -47,9 +47,8 @@ const GetPost = async function (req, res) {
     try {
         console.log("..........48");
         let PostId = req.query.PostId
-        let UserId = req.query.UserId
-        let  titilee= req.query.title
-console.log(".........51");
+       
+
         //---------[Validations]
         
         if (!mongoose.Types.ObjectId.isValid(PostId)) return res.status(400).send({ status: false, message: 'Invalid PosId Format' })
@@ -61,7 +60,7 @@ console.log(".........51");
         //---------(Check Reviews)
 
         let CommentedData = await CommentModule.find({ PostId: PostId }).select({PostId:0})
-
+console.log(CommentedData);
         //---------[Destructuring]
 
         let { _id, title ,body } = CheckPost

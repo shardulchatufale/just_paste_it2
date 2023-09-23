@@ -29,6 +29,7 @@ const CreateComment=async function(req,res){
 
         
         let filter = {
+            PostId:PostId,
             CommentedBy: req.UserId,
             rating: rating,
             comment: comment
@@ -37,8 +38,8 @@ const CreateComment=async function(req,res){
         let saveData = await CommentModule.create(filter);
         let response = await CommentModule.findById(saveData._id)
 
-        let { _id, title,body } = FindPost
-        let PostData = { post:{_id, title, body},CommentedData:response }
+        let {  title,body } = FindPost
+        let PostData = { post:{ title, body},CommentedData:response }
 
         //---------(Response)
         
