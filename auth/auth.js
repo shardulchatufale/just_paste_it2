@@ -32,28 +32,6 @@ const authenticate = function (req, res, next) {
 //......................................................................................................//
 
 
-// const authorise = async function (req, res, next) {
-//     try {
-//       console.log("........33");
-//       token = req.headers['x-api-key'];
-  
-//       let decodedToken = jwt.verify(token, 'just_paste_it');
-  
-//       let UserId = decodedToken.UserId;
 
-//       let findBlog = await userModule.findOne({ UserId: UserId });
-
-
-//       if (!findBlog)
-//         return res.status(403).send({ 
-//           status: false,
-//           msg: 'Unauthorized User',
-//         });
-//   console.log(".........49");
-//       next();
-//     } catch (err) {
-//       res.status(401).send({ Status: false, msg: err.message });
-//     }
-//   };
   
   module.exports={authenticate}

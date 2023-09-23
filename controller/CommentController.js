@@ -19,7 +19,7 @@ const CreateComment=async function(req,res){
 
         //-------(Destructuring)
 
-        let { rating, comment, CommentedBy } = data;
+        let { rating, comment } = data;
 
         //----(Rating)
 
@@ -29,8 +29,7 @@ const CreateComment=async function(req,res){
 
         
         let filter = {
-            PostId: PostId,
-            CommentedBy: CommentedBy,
+            CommentedBy: req.UserId,
             rating: rating,
             comment: comment
         };
@@ -49,5 +48,7 @@ const CreateComment=async function(req,res){
         res.status(500).send({ status: false, message: err.message })
     }
 }
+
+
 
 module.exports.CreateComment=CreateComment

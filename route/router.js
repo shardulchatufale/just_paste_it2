@@ -5,6 +5,7 @@ const MiddleWare=require("../auth/auth")
 const UserController=require("../controller/userController")
 const PostController=require("../controller/postController")
 const CommentController=require("../controller/CommentController")
+const LikeController=require("../controller/LikeController")
 
 //...............................TASK ONE........................................................
 
@@ -20,6 +21,6 @@ router.put('/UpdatePost',MiddleWare.authenticate,PostController.UpdatePost)
 router.delete('/deleteByQuery',MiddleWare.authenticate,PostController.deletedByQuery)
 
 router.post('/CreateComment',MiddleWare.authenticate, CommentController.CreateComment)
-
+router.post('/like',MiddleWare.authenticate,LikeController.LikePost)
 
 module.exports = router;

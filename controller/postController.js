@@ -45,17 +45,19 @@ const CreatePost = async function (req, res) {
 //..........................................................................................................
 const GetPost = async function (req, res) {
     try {
+        console.log("..........48");
         let PostId = req.query.PostId
-
+        let UserId = req.query.UserId
+        let  titilee= req.query.title
+console.log(".........51");
         //---------[Validations]
-
-        if (!mongoose.Types.ObjectId.isValid(PostId)) return res.status(400).send({ status: false, message: 'Invalid UserId Format' })
+        
+        if (!mongoose.Types.ObjectId.isValid(PostId)) return res.status(400).send({ status: false, message: 'Invalid PosId Format' })
 
         //---------[Checking Book is Present in Db or not]
-
-        let CheckPost = await PostModule.findOne({ _id: PostId })
+        
+        let CheckPost = await PostModule.findOne({ _id:PostId })
         if (!CheckPost) return res.status(404).send({ status: false, message: "post Not Found" });
-
         //---------(Check Reviews)
 
         let CommentedData = await CommentModule.find({ PostId: PostId }).select({PostId:0})

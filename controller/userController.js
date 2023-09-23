@@ -61,7 +61,7 @@ const login = async function (req, res) {
       {
         UserId: Login._id.toString(),
       },
-      'just_paste_it'
+      'just_paste_it', { expiresIn: '1d' }
     );
     res.setHeader('x-api-key', token);
     res.status(200).send({ status: true,message:" YOU ARE LOG IN SUCCESSFULLY", token: token });

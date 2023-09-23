@@ -3,14 +3,12 @@ const mongoose = require('mongoose')
 const reviewSchema = new mongoose.Schema({
     PostId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: 'PostId is  Required',
         ref: 'post',
         trim:true
     },
     CommentedBy: {
-        type: String,
-        default: 'Guest',
-        trim:true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
     },
     rating: {
         type: Number,
