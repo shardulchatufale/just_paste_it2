@@ -8,8 +8,9 @@ const { log } = require("console");
 const UserRegistration = async function (req, res) {
   try {
     let data = req.body
-    const { username, email, password } = data;
-
+    const { username, email, password ,...rest} = data;
+    if(Object.keys(rest).length>0)return res.status(400).send({ status: false, message: `you can't provide ${Object.keys(rest)} key` })
+        
     if (!password) return res.status(400).send({ status: false, message: 'Please enter password' })
     if (!validator.isValidPassword(password)) return res.status(400).send({ status: false, message: 'Password should be between 8 to 15 character[At least One Upper letter, one small letter, one number and one special charater]' })
 
@@ -40,7 +41,8 @@ const UserRegistration = async function (req, res) {
 //...................................................login api.......................................................
 const login = async function (req, res) {
   try {
-    const { username, password } = req.body;
+    const { username, password,...rest } = req.body;
+    if(Object.keys(rest).length>0)return res.status(400).send({ status: false, message: `you can't provide ${Object.keys(rest)} key` })
 
     if (!username) return res.status(400).send({ status: false, message: 'Please enter email' })
     if (!validator.isValidUserName(username)) return res.status(400).send({ status: false, message: 'Please enter valid username' })
@@ -56,7 +58,6 @@ const login = async function (req, res) {
     if (!passwordMatch) {
       return res.status(401).send({ message: 'Invalid username or password' });
     }
-    console.log("..............58");
      let token = jwt.sign(
       {
         UserId: Login._id.toString(),

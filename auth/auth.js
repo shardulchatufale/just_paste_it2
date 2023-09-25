@@ -2,10 +2,6 @@ const jwt = require('jsonwebtoken');
 
 const { default: mongoose } = require('mongoose')
 
-
-const postModule = require('../model/postModule');
-const userModule = require('../model/userModule');
-
 //------------------------------------------------------------------------------------------//
 
 const authenticate = function (req, res, next) {

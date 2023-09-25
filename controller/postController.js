@@ -11,26 +11,29 @@ const CreatePost = async function (req, res) {
     try {
 
         let data = req.body;
+        let {title,body,UserId,...rest}=data
         let token = req.headers['x-api-key'];
 
-        if (!data.UserId)return res.status(400).send({ status: false, msg: 'Userid required' });
-        if (!mongoose.Types.ObjectId.isValid(data.UserId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
- 
-        if (!data.title) return res.status(400).send({ status: false, msg: 'title required' });
-        if (!validator.isValid(data.title)) return res.status(400).send({ status: false, message: 'Please enter title name in right formate' })
+        if(Object.keys(rest).length>0)return res.status(400).send({ status: false, message: `you can't provide ${Object.keys(rest)} key` })
 
-        if (!data.body)return res.status(400).send({ status: false, msg: 'body required' });
-        if (!validator.isValid(data.body)) return res.status(400).send({ status: false, message: 'Please enter title name in right formate' })
+        if (!UserId)return res.status(400).send({ status: false, msg: 'Userid required' });
+        if (!mongoose.Types.ObjectId.isValid(UserId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
+ 
+        if (!title) return res.status(400).send({ status: false, msg: 'title required' });
+        if (!validator.isValid(title)) return res.status(400).send({ status: false, message: 'Please enter title name in right formate' })
+
+        if (!body)return res.status(400).send({ status: false, msg: 'body required' });
+        if (!validator.isValid(body)) return res.status(400).send({ status: false, message: 'Please enter title name in right formate' })
 
 
         let decodedToken = jwt.verify(token, 'just_paste_it');
 
-        if (decodedToken.UserId !==data.UserId){
+        if (decodedToken.UserId !==UserId){
             return res.status(403).send({ status: false, msg: 'Unauthorized' })}
 
-        const PostName = await PostModule.find({ UserId: data.UserId })
+        const PostName = await PostModule.find({ UserId: UserId })
         for (let i = 0; i < PostName.length; i++) {
-            if (PostName[i].title == data.title) {
+            if (PostName[i].title == title) {
                 return res.status(400).send({ status: false, msg: 'You already have same name post' });
             }
         }
@@ -48,6 +51,7 @@ const GetPost = async function (req, res) {
       
         let PostId = req.query.PostId
        
+
 
         //---------[Validations]
         
@@ -86,6 +90,9 @@ const UpdatePost = async function (req, res) {
         let PostId = req.query.PostId;
 
         let data = req.body;
+        let {title,body,...rest}=data
+        if(Object.keys(rest).length>0)return res.status(400).send({ status: false, message: `you can't provide ${Object.keys(rest)} key` })
+        
         if(!PostId) return res.status(400).send({ status: false, message: "Please Provide postid to update post." })
         if (!mongoose.Types.ObjectId.isValid(PostId)) return res.status(400).send({ status: false, message: "Invalid UserId" })
 
@@ -95,23 +102,22 @@ const UpdatePost = async function (req, res) {
         if (!post) return res.status(404).send({ status: false, message: "post Not Found" });
 
         const token = req.UserId
-
         if (token !== post.UserId.toString()) return res.status(403).send({ status: false, message: "you cannot update other users post" });
 
-        if (data.title) {            
+        if (title) {            
             let PostName = await PostModule.find({UserId:req.UserId })
 
             for (let i=0;i<PostName.length; i++) {
-                if (PostName[i].title == data.title) {
+                if (PostName[i].title == title) {
                     return res.status(400).send({ status: false, msg: 'You already have same name post' });
                 }
             }
-            post.title=data.title
+            post.title=title
         }
        
-        if (data.body) { 
-            if (!validator.isValid(data.body)) return res.status(400).send({ status: false, message: 'Please enter body in right formate' })
-            post.body=data.body
+        if (body) { 
+            if (!validator.isValid(body)) return res.status(400).send({ status: false, message: 'Please enter body in right formate' })
+            post.body=body
          }
 
         let updateData = await PostModule.findByIdAndUpdate({ _id:PostId }, post,{new:true} );
